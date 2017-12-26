@@ -1,4 +1,4 @@
-/*! JointJS v1.1.0 (2017-12-25) - JavaScript diagramming library
+/*! JointJS v1.1.0 (2017-12-26) - JavaScript diagramming library
 
 
 This Source Code Form is subject to the terms of the Mozilla Public
@@ -13152,8 +13152,6 @@ joint.routers.crossManhattan = (function(g, _, joint) {
     // size of the step to find a route
     step: 10,
 
-    crossCost: step / 2,
-
     // use of the perpendicular linkView option to connect center of element with first vertex
     perpendicular: true,
 
@@ -13254,6 +13252,7 @@ joint.routers.crossManhattan = (function(g, _, joint) {
     var opt = this.options;
 
     // source or target element could be excluded from set of obstacles
+
     var excludedEnds = _.chain(opt.excludeEnds)
       .map(link.get, link)
       .pluck('id')
@@ -13328,6 +13327,7 @@ joint.routers.crossManhattan = (function(g, _, joint) {
     })
 
     linksPoints = _.flatten(linksPoints)
+    // linksPoints = _.uniqWith(linksPoints, _.isEqual);
     this.linksPoints = linksPoints;
     return linksPoints;
   }
@@ -13412,6 +13412,7 @@ joint.routers.crossManhattan = (function(g, _, joint) {
 
       route.unshift(current);
       prevDiff = diff;
+
       current = parent;
     }
 
@@ -13470,7 +13471,6 @@ joint.routers.crossManhattan = (function(g, _, joint) {
 
   // finds the route between to points/rectangles implementing A* alghoritm
   function findRoute(start, end, map, opt) {
-
     var step = opt.step;
     var startPoints, endPoints;
     var startCenter, endCenter;
@@ -13562,15 +13562,15 @@ joint.routers.crossManhattan = (function(g, _, joint) {
             continue;
           }
 
-          var crosCost = 0
+          var crossCost = 0
           _.each(map.linksPoints, function(point) {
             if(point.x === neighborPoint.x && point.y === neighborPoint.y){
-              crosCost += opt.crossCost;
+              crossCost += opt.crossCost;
               return
             }
           })
           // The current direction is ok to proccess.
-          var costFromStart = currentDist + dir.cost + opt.penalties[dirChange];
+          var costFromStart = currentDist + dir.cost + opt.penalties[dirChange] + crossCost;
 
           if (!openSet.isOpen(neighborKey) || costFromStart < costs[neighborKey]) {
             // neighbor point has not been processed yet or the cost of the path
@@ -13615,8 +13615,10 @@ joint.routers.crossManhattan = (function(g, _, joint) {
     this.options.perpendicular = !!opt.perpendicular;
 
     // expand boxes by specific padding
+
     var sourceBBox = g.rect(this.sourceBBox).moveAndExpand(opt.paddingBox);
     var targetBBox = g.rect(this.targetBBox).moveAndExpand(opt.paddingBox);
+
 
     // pathfinding
     var obstracleMap = new ObstacleMap(opt)
@@ -13684,7 +13686,6 @@ joint.routers.crossManhattan = (function(g, _, joint) {
   };
 
 })(g, _, joint);
-
 joint.routers.manhattan = (function(g, _, joint) {
 
     'use strict';
